@@ -170,6 +170,11 @@ jobs:
           name: Setup EC2 instance to run as backend
           command: |
             yum install -y tar gzip ansible awscli
+      - run:
+          name: Run ansible playbook
+          command: |
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
 
 
 
