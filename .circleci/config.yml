@@ -1,8 +1,19 @@
 version: 2.1
 
 orbs:
-  slack: circleci/slack@4.1
+  slack: circleci/slack@4.10.1
   node: circleci/node@5.0.2
+
+commands:
+  destroy-infrastructure:
+    steps:
+      - run:
+          name: Destroy infrastructure
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+            aws s3 rm s3://udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
 
 jobs:
   build-frontend: 
@@ -108,6 +119,46 @@ jobs:
           mentions: "@Ninyo"
           template: basic_fail_1
 
+  deploy-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            yum install -y tar gzip
+      - run:
+          name: Deploy backend infrastructure 
+          command: |
+            aws cloudformation deploy \
+            --template-file .circleci/files/backend.yml \
+            --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
+            --tags project=udapeople
+      - run:
+          name: Deploy frontend infrastructure
+          command: |
+            aws cloudformation deploy \
+            --template-file .circleci/files/frontend.yml \
+            --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
+            --tags project=udapeople
+
+      - run: 
+          name: Retrieve backend server ip and add it to ansible inventory
+          command: |
+            aws ec2 describe-instances \ 
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --filters "Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --output text >> ~/.circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths: 
+            - .circleci/ansible/inventory.txt
+      - destroy-infrastructure
+
+
 workflows:
   build-project:
     jobs:
@@ -123,5 +174,6 @@ workflows:
       - scan-backend:
           context: slack-secrets
           requires: [build-backend]
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend , scan-backend]
             
-
