@@ -90,8 +90,8 @@ jobs:
           command: |
             cd frontend
             npm install 
-            npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
+            npm audit fix --audit-level=critical --force
       - slack/notify: 
           channel: D03F3MZH9QU
           mentions: "@Ninyo"
@@ -110,9 +110,9 @@ jobs:
           command: |
             cd backend
             npm install
+            npm audit --audit-level=critical
             npm audit fix --audit-level=critical --force
             npm audit fix --force
-            npm audit --audit-level=critical
       - slack/notify: 
           event: fail
           channel: D03F3MZH9QU
