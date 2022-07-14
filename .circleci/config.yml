@@ -22,7 +22,6 @@ jobs:
           name: Build backend 
           command: |
             cd backend
-            npm login 
             npm install
             npm run build
 
