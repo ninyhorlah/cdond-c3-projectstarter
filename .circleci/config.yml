@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  slack: circleci/slack@4.1
+
 jobs:
   build-frontend: 
     docker:
@@ -61,6 +64,10 @@ jobs:
             npm install 
             npm audit fix --audit-level=critical
             npm audit --audit-level=critical
+      - slack-notify: 
+          event: fail
+          mentions: "@Ninyo"
+          template: basic_fail_1
 
   scan-backend:
     docker:
@@ -74,6 +81,10 @@ jobs:
             npm install
             npm audit fix --audit-level=critical
             npm audit --audit-level=critical
+      - slack-notify: 
+          event: fail
+          mentions: "@Ninyo"
+          template: basic_fail_1
 
 workflows:
   build-project:
@@ -86,7 +97,9 @@ workflows:
           requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
+          context: slack-secrets
       - scan-backend:
           requires: [build-backend]
+          context: slack-secrets
             
 
