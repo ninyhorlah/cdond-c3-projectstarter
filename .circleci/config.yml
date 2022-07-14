@@ -58,13 +58,14 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout 
+      - restore_cache:
+          keys: [frontend-build]
       - run: 
           name: Scan Frontend
           command: |
             cd frontend
             npm install 
             npm audit fix --audit-level=critical --force
-            npm audit fix --force
             npm audit --audit-level=critical
       - slack/notify: 
           channel: D03F3MZH9QU
@@ -77,6 +78,8 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout 
+      - restore_cache:
+          keys: [backend-build]
       - run: 
           name: Scan Backend 
           command: |
