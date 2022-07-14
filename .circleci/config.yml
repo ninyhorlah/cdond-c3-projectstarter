@@ -66,6 +66,7 @@ jobs:
             npm audit --audit-level=critical
       - slack/notify: 
           event: fail
+          channel: D03F3MZH9QU
           mentions: "@Ninyo"
           template: basic_fail_1
 
@@ -83,6 +84,7 @@ jobs:
             npm audit --audit-level=critical
       - slack/notify: 
           event: fail
+          channel: D03F3MZH9QU
           mentions: "@Ninyo"
           template: basic_fail_1
 
@@ -96,10 +98,10 @@ workflows:
       - test-backend:
           requires: [build-backend]
       - scan-frontend:
+          context: slack-secrets
           requires: [build-frontend]
-          context: slack-secrets
       - scan-backend:
-          requires: [build-backend]
           context: slack-secrets
+          requires: [build-backend]
             
 
