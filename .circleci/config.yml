@@ -169,7 +169,7 @@ jobs:
       - run: 
           name: Setup EC2 instance to run as backend
           command: |
-            pip3 install -y tar gzip ansible awscli
+            pip3 install tar gzip ansible awscli
       - run:
           name: Run ansible playbook
           command: |
