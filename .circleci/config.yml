@@ -148,12 +148,25 @@ jobs:
       - run: 
           name: Retrieve backend server ip and add it to ansible inventory
           command: |
-            aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text >> ~/.circleci/ansible/inventory.txt
+            aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text >> ~/task/.circleci/ansible/inventory.txt
+            cat ~/task/.circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
           paths: 
-            - .circleci/ansible/inventory.txt
+            - task/.circleci/ansible/inventory.txt
       - destroy-infrastructure
+
+  configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys: 
+          fingerprints: ["76:d4:20:2b:5f:62:c5:de:21:90:f8:0c:56:17:1b:f0"]
+      - run: 
+          name: Setup EC2 instance to run as backend
+          command: |
+
 
 
 workflows:
