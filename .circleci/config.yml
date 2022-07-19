@@ -261,6 +261,22 @@ jobs:
   smoke-test:
     docker:
       - image: alpine3.11
+    steps:
+      - run: 
+          name: Install dependencies
+          command: |
+            yum install -y curl nodejs npm awscli
+      - run: 
+          name: Retrieve backend ip address 
+          command: |
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
+            if curl "${API_URL}/api/status" | grep "ok"
+            then
+                return 0
+            else
+                return 1
+            fi
         
 workflows:
   build-project:
