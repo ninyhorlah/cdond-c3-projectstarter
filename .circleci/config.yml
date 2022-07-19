@@ -208,7 +208,6 @@ jobs:
           command: |
             yum install -y tar
             yum install -y python
-            yum install -y npm 
             npm install nodejs 
             yum install -y ansible 
             yum install -y awscli 
