@@ -169,7 +169,7 @@ jobs:
       - run: 
           name: Install dependencies
           command: |
-            apt install -y ansible
+            apk add --update ansible 
       - run:
           name: Run ansible playbook
           command: |
@@ -241,8 +241,9 @@ jobs:
       - run: 
           name: Deploy backend 
           command: |
-            yum install -y tar gzip
-            sudo yum install -y ansible awscli nodejs npm
+            apk add --update tar gzip ansible npm 
+            /usr/local/bin/python -m pip install --upgrade pip
+            pip install awscli
       - run:
           name: Copy files using ansible 
           command: |
