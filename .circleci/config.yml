@@ -166,10 +166,7 @@ jobs:
           fingerprints: ["54:1d:1d:e9:af:82:99:73:57:31:2f:f6:00:40:26:aa"]
       - attach_workspace:
           at: ~/
-      - run: 
-          name: Setup EC2 instance to run as backend
-          command: |
-            python3 -m pip install ansible
+      
       - run:
           name: Run ansible playbook
           command: |
@@ -208,8 +205,8 @@ jobs:
             yum install -y python
             yum install -y nodejs 
             yum install -y npm 
-            python3 -m pip install ansible 
-            python3 -m pip install awscli 
+            yum install -y ansible 
+            yum install -y awscli 
 
       - run: 
           name: Export backend IP
@@ -242,7 +239,7 @@ jobs:
           name: Deploy backend 
           command: |
             yum install -y tar gzip
-            python3 -m pip install ansible awscli nodejs npm
+            sudo yum install -y ansible awscli nodejs npm
       - run:
           name: Copy files using ansible 
           command: |
@@ -258,7 +255,7 @@ jobs:
             ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-infrastructure
 
-  smoke-test:
+  backend-smoke-test:
     docker:
       - image: alpine3.11
     steps:
@@ -267,7 +264,7 @@ jobs:
           command: |
             yum install -y curl nodejs npm awscli
       - run: 
-          name: Retrieve backend ip address 
+          name: Retrieve backend ip address and run smoke test on backend 
           command: |
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
@@ -277,6 +274,20 @@ jobs:
             else
                 return 1
             fi
+      - run: 
+          name: Run smoke test on frontend using s3 bucket public ip
+          command: |
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
+            echo ${URL} 
+            if curl -s ${URL} | grep "Welcome"
+            then
+                # Change this to 0 after the job fails
+              return 1
+            else
+              return 1
+            fi
+      - destroy-infrastructure
+
         
 workflows:
   build-project:
