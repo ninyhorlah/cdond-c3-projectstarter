@@ -203,8 +203,6 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/
       - run: 
           name: Install dependencies
           command: |
@@ -214,7 +212,8 @@ jobs:
             yum install -y npm 
             yum install -y ansible 
             yum install -y awscli 
-
+      - attach_workspace:
+          at: ~/
       - run: 
           name: Export backend IP
           command: |
