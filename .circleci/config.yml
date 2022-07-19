@@ -166,7 +166,10 @@ jobs:
           fingerprints: ["54:1d:1d:e9:af:82:99:73:57:31:2f:f6:00:40:26:aa"]
       - attach_workspace:
           at: ~/
-      
+      - run: 
+          name: Install dependencies
+          command: |
+            apt-get install -y ansible
       - run:
           name: Run ansible playbook
           command: |
@@ -292,20 +295,20 @@ jobs:
 workflows:
   build-project:
     jobs:
-      - build-frontend
-      - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - scan-frontend:
-          requires: [build-frontend]
-      - scan-backend:
-          requires: [build-backend]
-      - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend , scan-backend]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
+      # - build-frontend
+      # - build-backend
+      # - test-frontend:
+      #     requires: [build-frontend]
+      # - test-backend:
+      #     requires: [build-backend]
+      # - scan-frontend:
+      #     requires: [build-frontend]
+      # - scan-backend:
+      #     requires: [build-backend]
+      # - deploy-infrastructure:
+      #     requires: [test-frontend, test-backend, scan-frontend , scan-backend]
+      - configure-infrastructure
+          # requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
       - deploy-frontend:
