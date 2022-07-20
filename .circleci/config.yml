@@ -200,16 +200,16 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image: amazon/aws-cli
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - run: 
           name: Install dependencies
           command: |
-            yum install -y tar gzip
-            yum install -y python3
-            yum install -y awscli 
-            python3 -m pip install npm
+            npm install tar gzip
+            npm install python3
+            npm install awscli 
+            # python3 -m pip install npm
       - attach_workspace:
           at: ~/
       - run: 
@@ -223,8 +223,6 @@ jobs:
       - run:
           name: Deploy frontend objects 
           command: |
-            yum install -y python3
-            python3 -m pip install npm
             cd frontend
             npm install
             npm run build
