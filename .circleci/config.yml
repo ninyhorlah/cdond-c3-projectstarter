@@ -14,6 +14,20 @@ commands:
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
             aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+  # revert-migrations:
+  #   steps:
+  #     - run: 
+  #         name: Revert migrations 
+  #         when: on_fail
+  #         command: |
+  #           SUCCESS=$(curl --insecure  https://kvdb.io/AG66VEkndRmbJkBjKDM4Va/migration_<< parameters.workflow_id >>)
+  #               # Logic for reverting the database state
+  #               if (( $SUCCESS == 1 ));
+  #               then
+  #                   cd ~/project/backend
+  #                   npm install
+  #                   npm run migration:revert
+  #               fi
 
 jobs:
   build-frontend: 
@@ -159,7 +173,7 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: python:3.7-alpine3.16
     steps:
       - checkout
       - add_ssh_keys: 
@@ -201,7 +215,7 @@ jobs:
   deploy-frontend:
     docker:
       # - image: amazon/aws-cli
-      - image: python:3.7-alpine3.11
+      - image: python:3.7-alpine3.16
     steps:
       - checkout
       - run: 
@@ -231,7 +245,7 @@ jobs:
 
   deploy-backend:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: python:3.7-alpine3.16
     steps:
       - checkout
       - add_ssh_keys: 
@@ -261,8 +275,9 @@ jobs:
 
   smoke-test:
     docker:
-      - image: alpine3.11
+      - image: python:3.7-alpine3.16
     steps:
+      - checkout
       - run: 
           name: Install dependencies
           command: |
@@ -316,4 +331,6 @@ workflows:
           requires: [configure-infrastructure, run-migrations]
       - deploy-backend:
           requires: [deploy-frontend, run-migrations]
+      - smoke-test:
+          requires: [deploy-frontend, deploy-backend]
             
