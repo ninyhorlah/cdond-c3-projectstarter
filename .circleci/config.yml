@@ -209,6 +209,7 @@ jobs:
             yum install -y tar gzip
             yum install -y python
             yum install -y awscli 
+            apk add --update npm
       - attach_workspace:
           at: ~/
       - run: 
