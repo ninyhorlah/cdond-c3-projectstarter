@@ -209,6 +209,7 @@ jobs:
             yum install -y tar gzip
             yum install -y python3
             yum install -y awscli 
+            yum install -y nodejs 
             python3 -m pip install npm
       - attach_workspace:
           at: ~/
@@ -224,8 +225,8 @@ jobs:
           name: Deploy frontend objects 
           command: |
             cd frontend
-            # npm install
-            # npm run build
+            npm install
+            npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       - destroy-infrastructure
