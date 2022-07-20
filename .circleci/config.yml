@@ -208,7 +208,8 @@ jobs:
           command: |
             npm install tar gzip
             npm install python3
-            npm install awscli 
+            npm install apk 
+            apk add --update awscli 
             # python3 -m pip install npm
       - attach_workspace:
           at: ~/
