@@ -207,9 +207,9 @@ jobs:
           name: Install dependencies
           command: |
             yum install -y tar gzip
-            yum install -y python
+            yum install -y python3
             yum install -y awscli 
-            apk add --update npm
+            python3 -m pip install npm
       - attach_workspace:
           at: ~/
       - run: 
