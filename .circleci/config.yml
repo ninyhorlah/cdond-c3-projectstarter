@@ -14,20 +14,20 @@ commands:
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
             aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
-  # revert-migrations:
-  #   steps:
-  #     - run: 
-  #         name: Revert migrations 
-  #         when: on_fail
-  #         command: |
-  #           SUCCESS=$(curl --insecure  https://kvdb.io/AG66VEkndRmbJkBjKDM4Va/migration_<< parameters.workflow_id >>)
-  #               # Logic for reverting the database state
-  #               if (( $SUCCESS == 1 ));
-  #               then
-  #                   cd ~/project/backend
-  #                   npm install
-  #                   npm run migration:revert
-  #               fi
+  revert-migrations:
+    steps:
+      - run: 
+          name: Revert migrations 
+          when: on_fail
+          command: |
+            SUCCESS=$(curl --insecure  https://kvdb.io/AG66VEkndRmbJkBjKDM4Va/migration_${CIRCLE_WORKFLOW_ID:0:7})
+                # Logic for reverting the database state
+                if (( $SUCCESS == 1 ));
+                then
+                    cd ~/project/backend
+                    npm install
+                    npm run migration:revert
+                fi
 
 jobs:
   build-frontend: 
@@ -303,7 +303,7 @@ jobs:
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
             then
-                return 0
+                return 1
             else
                 return 1
             fi
@@ -315,11 +315,12 @@ jobs:
             if curl -s ${URL} | grep "Welcome"
             then
                 # Change this to 0 after the job fails
-              return 1
+              return 0
             else
               return 1
             fi
-      # - destroy-infrastructure
+      - destroy-infrastructure
+      - revert-migrations
 
         
 workflows:
