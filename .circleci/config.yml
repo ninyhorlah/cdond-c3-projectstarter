@@ -350,7 +350,7 @@ jobs:
           command: |
             yum install -y tar gzip
       - attach_workspace:
-        at: ~/
+          at: ~/
       - run:
           name: Job cleanup
           command: |
