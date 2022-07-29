@@ -350,29 +350,29 @@ jobs:
 
   cleanup:
     docker:
-      - image: amazon/aws-cli
+    - image:  amazon/aws-cli
     steps:
-      - checkout
-      - run:
-          name: Job cleanup
-          command: |
-            export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text)            
-            echo OldWorkflowID: "${OldWorkflowID}"
-            echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
-
-            # Fetch the stack names          
-            export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
-            echo Stack names: "${STACKS[@]}" 
-
-            if [[ "${CIRCLE_WORKFLOW_ID:0:7}" =~ "${OldWorkflowID}" ]]
-            then
-              aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-              aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-              aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
-
-            else
-              echo "No blue deployment available"
-            fi
+    - checkout
+    - run: yum install -y tar gzip
+    - attach_workspace:
+        at: ~/
+    - run:
+        name: Job cleanup
+        command: |
+          export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text)
+          echo OldWorkflowID: "${OldWorkflowID}"
+          echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
+          export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
+          echo Stack names: "${STACKS[@]}"
+          if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+          then
+            echo "Deleted Blue Deployment"
+            aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+            aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
+            aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+          else
+            echo "No blue deployment available"
+          fi
 
         
 workflows:
@@ -390,18 +390,50 @@ workflows:
           requires: [build-backend]
       - deploy-infrastructure:
           requires: [test-frontend, test-backend, scan-frontend , scan-backend]
+          filters:
+              branches:
+                only:
+                  - main
       - configure-infrastructure:
           requires: [deploy-infrastructure]
+          filters:
+              branches:
+                only:
+                  - main
       - run-migrations:
           requires: [configure-infrastructure]
+          filters:
+              branches:
+                only:
+                  - main
       - deploy-frontend:
           requires: [configure-infrastructure, run-migrations]
+          filters:
+              branches:
+                only:
+                  - main
       - deploy-backend:
           requires: [deploy-frontend, run-migrations]
+          filters:
+              branches:
+                only:
+                  - main
       - smoke-test:
           requires: [deploy-frontend, deploy-backend]
+          filters:
+              branches:
+                only:
+                  - main
       - cloudfront-update:
           requires: [smoke-test]
+          filters:
+              branches:
+                only:
+                  - main
       - cleanup:
           requires: [cloudfront-update]
+          filters:
+              branches:
+                only:
+                  - main
             
