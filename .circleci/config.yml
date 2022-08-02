@@ -368,9 +368,9 @@ jobs:
           if [[ "${OldWorkflowID}" ]]
           then
             echo "Deleted Blue Deployment"
-            aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-            aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-            aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+            aws s3 rm s3://udapeople-${OldWorkflowID} --recursive
+            aws cloudformation delete-stack --stack-name udapeople-backend-${OldWorkflowID}
+            aws cloudformation delete-stack --stack-name udapeople-frontend-${OldWorkflowID}
           else
             echo "No blue deployment available"
           fi
