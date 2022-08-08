@@ -360,11 +360,11 @@ jobs:
         name: Job cleanup
         command: |
           export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text)
-          export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
+          # export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
           echo OldWorkflowID: "${OldWorkflowID}"
           echo CIRCLE_WORKFLOW_ID: "${CIRCLE_WORKFLOW_ID:0:7}"
           echo Stack names: "${STACKS[@]}"
-          if [[ "${STACKS[@]}" =~ "${CIRCLE_WORKFLOW_ID:0:7}" ]]
+          if [[ "${CIRCLE_WORKFLOW_ID:0:7}" =~ "${CIRCLE_WORKFLOW_ID:0:7}" ]]
           then
             echo "Deleted Blue Deployment"
             aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID} --recursive
